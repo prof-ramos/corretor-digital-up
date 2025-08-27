@@ -2,20 +2,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ArrowRight, Shield } from "lucide-react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const formSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Digite um e-mail válido"),
+  whatsapp: z.string()
+    .min(10, "WhatsApp deve ter pelo menos 10 dígitos")
+    .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, "Formato: (11) 99999-9999")
+});
+
+const formatWhatsApp = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 10) {
+    return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  }
+  return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+};
 
 const LeadForm = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    whatsapp: ""
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      whatsapp: ""
+    }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Form submitted:", values);
     // Handle form submission here
-    console.log("Form submitted:", formData);
   };
 
   return (
@@ -31,62 +52,85 @@ const LeadForm = () => {
             </p>
           </div>
 
-          <Card className="bg-white/95 backdrop-blur-sm shadow-strong max-w-2xl mx-auto">
+          <Card className="bg-white/95 backdrop-blur-sm shadow-strong max-w-2xl mx-auto animate-scale-in">
             <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="name" className="text-sm font-medium text-foreground">Nome Completo</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Digite seu nome completo"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="mt-2 h-12"
-                    required
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-foreground">Nome Completo</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Digite seu nome completo"
+                            className="mt-2 h-12"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-foreground">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="mt-2 h-12"
-                    required
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-foreground">E-mail</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="seu@email.com"
+                            className="mt-2 h-12"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div>
-                  <Label htmlFor="whatsapp" className="text-sm font-medium text-foreground">WhatsApp</Label>
-                  <Input
-                    id="whatsapp"
-                    type="tel"
-                    placeholder="(11) 99999-9999"
-                    value={formData.whatsapp}
-                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                    className="mt-2 h-12"
-                    required
+                  <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-foreground">WhatsApp</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="(11) 99999-9999"
+                            className="mt-2 h-12"
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatWhatsApp(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full bg-secondary hover:bg-secondary-dark text-white font-semibold py-4 text-lg rounded-full shadow-glow transition-bounce hover:scale-105 group"
-                >
-                  Quero Receber o Material Gratuito
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full bg-secondary hover:bg-secondary-dark text-white font-semibold py-4 text-lg rounded-full shadow-glow transition-bounce hover:scale-105 group"
+                  >
+                    Quero Receber o Material Gratuito
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
 
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <Shield className="h-4 w-4" />
-                  <span>Seus dados estão 100% seguros conosco</span>
-                </div>
-              </form>
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Shield className="h-4 w-4" />
+                    <span>Seus dados estão 100% seguros conosco</span>
+                  </div>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </div>

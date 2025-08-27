@@ -40,7 +40,11 @@ const Testimonials = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="bg-card shadow-soft hover:shadow-medium transition-smooth border-0">
+            <Card 
+              key={index} 
+              className="bg-card shadow-soft hover:shadow-medium transition-smooth border-0 hover:transform hover:-translate-y-2 animate-slide-in"
+              style={{ animationDelay: `${index * 200}ms` }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -53,7 +57,7 @@ const Testimonials = () => {
                 </p>
                 
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 shadow-soft">
                     {testimonial.avatar}
                   </div>
                   <div>

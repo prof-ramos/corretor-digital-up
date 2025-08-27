@@ -52,10 +52,11 @@ const Benefits = () => {
             return (
               <div 
                 key={index}
-                className="bg-card p-8 rounded-2xl shadow-soft hover:shadow-medium transition-smooth group hover:scale-105"
+                className="bg-card p-8 rounded-2xl shadow-soft hover:shadow-medium transition-smooth group hover:scale-105 animate-fade-in"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 group-hover:shadow-glow transition-smooth">
-                  <Icon className="h-8 w-8 text-white" />
+                  <Icon className="h-8 w-8 text-white group-hover:scale-110 transition-transform" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
                   {benefit.title}
